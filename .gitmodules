@@ -1,0 +1,18 @@
+[submodule ".github/BMAD-METHOD"]
+	path = .github/BMAD-METHOD
+	url = https://github.com/bmad-code-org/BMAD-METHOD.git
+[submodule ".github/spec-kit"]
+	path = .github/spec-kit
+	url = https://github.com/github/spec-kit.git
+[submodule ".github/claude-code-spec-workflow"]
+	path = .github/claude-code-spec-workflow
+	url = https://github.com/Pimzino/claude-code-spec-workflow.git
+[submodule ".github/skills"]
+	path = .github/skills
+	url = https://github.com/anthropics/skills.git
+[submodule ".github/claude-skills"]
+	path = .github/claude-skills
+	url = https://github.com/alirezarezvani/claude-skills.git
+[submodule ".github/claude-flow"]
+	path = .github/claude-flow
+	url = https://github.com/ruvnet/claude-flow.git
