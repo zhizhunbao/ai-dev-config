@@ -1,18 +1,18 @@
-[submodule ".github/BMAD-METHOD"]
-	path = .github/BMAD-METHOD
+[submodule "references/BMAD-METHOD"]
+	path = references/BMAD-METHOD
 	url = https://github.com/bmad-code-org/BMAD-METHOD.git
-[submodule ".github/spec-kit"]
-	path = .github/spec-kit
+[submodule "references/spec-kit"]
+	path = references/spec-kit
 	url = https://github.com/github/spec-kit.git
-[submodule ".github/claude-code-spec-workflow"]
-	path = .github/claude-code-spec-workflow
+[submodule "references/claude-code-spec-workflow"]
+	path = references/claude-code-spec-workflow
 	url = https://github.com/Pimzino/claude-code-spec-workflow.git
-[submodule ".github/skills"]
-	path = .github/skills
+[submodule "references/anthropic-skills"]
+	path = references/anthropic-skills
 	url = https://github.com/anthropics/skills.git
-[submodule ".github/claude-skills"]
-	path = .github/claude-skills
+[submodule "references/claude-skills"]
+	path = references/claude-skills
 	url = https://github.com/alirezarezvani/claude-skills.git
-[submodule ".github/claude-flow"]
-	path = .github/claude-flow
+[submodule "references/claude-flow"]
+	path = references/claude-flow
 	url = https://github.com/ruvnet/claude-flow.git
