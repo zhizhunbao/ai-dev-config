@@ -10,7 +10,7 @@
     The path to the target project directory
 
 .PARAMETER Platform
-    The AI platform to configure (claude, cursor, windsurf, kiro, all)
+    The AI platform to configure (claude, cursor, windsurf, kiro, codex, copilot, antigravity, all)
 
 .EXAMPLE
     .\init-project.ps1 -ProjectPath "C:\Projects\my-app" -Platform all
@@ -21,13 +21,14 @@ param(
     [string]$ProjectPath,
 
     [Parameter(Mandatory=$false)]
-    [ValidateSet("claude", "cursor", "windsurf", "kiro", "all")]
+    [ValidateSet("claude", "cursor", "windsurf", "kiro", "codex", "copilot", "antigravity", "all")]
     [string]$Platform = "all"
 )
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ConfigRoot = Split-Path -Parent $ScriptDir
-$SharedSource = Join-Path $ConfigRoot ".shared"
+$CoreSource = Join-Path $ConfigRoot "core"
+$AdaptersSource = Join-Path $ConfigRoot "adapters"
 
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host "  AI Dev Config - Project Initializer  " -ForegroundColor Cyan
@@ -35,8 +36,8 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
 # Validate source exists
-if (-not (Test-Path $SharedSource)) {
-    Write-Host "Error: .shared directory not found at $SharedSource" -ForegroundColor Red
+if (-not (Test-Path $CoreSource)) {
+    Write-Host "Error: core directory not found at $CoreSource" -ForegroundColor Red
     exit 1
 }
 
@@ -46,17 +47,17 @@ if (-not (Test-Path $ProjectPath)) {
     New-Item -ItemType Directory -Path $ProjectPath -Force | Out-Null
 }
 
-# Copy .shared directory
-Write-Host "Copying .shared directory..." -ForegroundColor Green
-$DestShared = Join-Path $ProjectPath ".shared"
-if (Test-Path $DestShared) {
-    Write-Host "  .shared already exists, skipping..." -ForegroundColor Yellow
+# Copy core directory
+Write-Host "Copying core directory..." -ForegroundColor Green
+$DestCore = Join-Path $ProjectPath "core"
+if (Test-Path $DestCore) {
+    Write-Host "  core already exists, skipping..." -ForegroundColor Yellow
 } else {
-    Copy-Item -Path $SharedSource -Destination $DestShared -Recurse
+    Copy-Item -Path $CoreSource -Destination $DestCore -Recurse
     Write-Host "  Done!" -ForegroundColor Green
 }
 
-# Create .agent directory with junctions
+# Create .agent directory with junctions (for Antigravity)
 Write-Host "Creating .agent directory with junctions..." -ForegroundColor Green
 $AgentDir = Join-Path $ProjectPath ".agent"
 if (-not (Test-Path $AgentDir)) {
@@ -66,61 +67,98 @@ if (-not (Test-Path $AgentDir)) {
 $Junctions = @("skills", "agents", "workflows", "templates")
 foreach ($dir in $Junctions) {
     $JunctionPath = Join-Path $AgentDir $dir
-    $TargetPath = Join-Path $DestShared $dir
+    $TargetPath = Join-Path $DestCore $dir
 
     if (Test-Path $JunctionPath) {
         Write-Host "  $dir junction already exists, skipping..." -ForegroundColor Yellow
     } else {
         cmd /c mklink /J $JunctionPath $TargetPath | Out-Null
-        Write-Host "  Created junction: $dir -> .shared/$dir" -ForegroundColor Green
+        Write-Host "  Created junction: $dir -> core/$dir" -ForegroundColor Green
     }
 }
 
-# Create platform-specific configurations
+# Platform-specific configurations
 Write-Host "Creating platform configurations..." -ForegroundColor Green
-$RulesSource = Join-Path $DestShared "rules.md"
 
 function Create-PlatformConfig {
-    param($FileName, $PlatformName)
+    param(
+        [string]$Platform,
+        [string]$FileName,
+        [string]$TemplateName
+    )
+    
     $FilePath = Join-Path $ProjectPath $FileName
+    $TemplateDir = Join-Path $AdaptersSource "$Platform\templates"
+    $TemplatePath = Join-Path $TemplateDir $TemplateName
+    
     if (Test-Path $FilePath) {
         Write-Host "  $FileName already exists, skipping..." -ForegroundColor Yellow
+    } elseif (Test-Path $TemplatePath) {
+        # Create parent directory if needed
+        $ParentDir = Split-Path -Parent $FilePath
+        if (-not (Test-Path $ParentDir)) {
+            New-Item -ItemType Directory -Path $ParentDir -Force | Out-Null
+        }
+        Copy-Item -Path $TemplatePath -Destination $FilePath
+        Write-Host "  Created $FileName" -ForegroundColor Green
     } else {
-        Copy-Item -Path $RulesSource -Destination $FilePath
-        Write-Host "  Created $FileName for $PlatformName" -ForegroundColor Green
+        Write-Host "  Template not found for $Platform, skipping..." -ForegroundColor Yellow
     }
 }
 
 switch ($Platform) {
     "claude" {
-        Create-PlatformConfig "CLAUDE.md" "Claude Code"
+        Create-PlatformConfig "claude" "CLAUDE.md" "base.md"
+        # Create .claude directory
+        $ClaudeDir = Join-Path $ProjectPath ".claude"
+        if (-not (Test-Path $ClaudeDir)) {
+            New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null
+        }
+        # Create skills junction
+        $ClaudeSkills = Join-Path $ClaudeDir "skills"
+        if (-not (Test-Path $ClaudeSkills)) {
+            $TargetPath = Join-Path $DestCore "skills"
+            cmd /c mklink /J $ClaudeSkills $TargetPath | Out-Null
+            Write-Host "  Created .claude/skills junction" -ForegroundColor Green
+        }
     }
     "cursor" {
-        Create-PlatformConfig ".cursorrules" "Cursor"
+        Create-PlatformConfig "cursor" ".cursorrules" "base.md"
     }
     "windsurf" {
-        Create-PlatformConfig ".windsurfrules" "Windsurf"
+        Create-PlatformConfig "windsurf" ".windsurfrules" "base.md"
     }
     "kiro" {
-        $KiroDir = Join-Path $ProjectPath ".kiro\steering"
-        if (-not (Test-Path $KiroDir)) {
-            New-Item -ItemType Directory -Path $KiroDir -Force | Out-Null
-        }
-        Create-PlatformConfig ".kiro\steering\project.md" "Kiro"
+        Create-PlatformConfig "kiro" ".kiro\steering\project.md" "project.md"
+    }
+    "codex" {
+        Create-PlatformConfig "codex" "AGENTS.md" "agents.md"
+    }
+    "copilot" {
+        Create-PlatformConfig "copilot" ".github\copilot-instructions.md" "instructions.md"
+    }
+    "antigravity" {
+        Write-Host "  Antigravity configured via .agent/ junctions" -ForegroundColor Green
     }
     "all" {
-        Create-PlatformConfig "CLAUDE.md" "Claude Code"
-        Create-PlatformConfig ".cursorrules" "Cursor"
-        Create-PlatformConfig ".windsurfrules" "Windsurf"
-        $KiroDir = Join-Path $ProjectPath ".kiro\steering"
-        if (-not (Test-Path $KiroDir)) {
-            New-Item -ItemType Directory -Path $KiroDir -Force | Out-Null
+        # Claude
+        Create-PlatformConfig "claude" "CLAUDE.md" "base.md"
+        $ClaudeDir = Join-Path $ProjectPath ".claude"
+        if (-not (Test-Path $ClaudeDir)) {
+            New-Item -ItemType Directory -Path $ClaudeDir -Force | Out-Null
         }
-        $KiroFile = Join-Path $ProjectPath ".kiro\steering\project.md"
-        if (-not (Test-Path $KiroFile)) {
-            Copy-Item -Path $RulesSource -Destination $KiroFile
-            Write-Host "  Created .kiro/steering/project.md for Kiro" -ForegroundColor Green
+        $ClaudeSkills = Join-Path $ClaudeDir "skills"
+        if (-not (Test-Path $ClaudeSkills)) {
+            $TargetPath = Join-Path $DestCore "skills"
+            cmd /c mklink /J $ClaudeSkills $TargetPath | Out-Null
+            Write-Host "  Created .claude/skills junction" -ForegroundColor Green
         }
+        
+        # Others
+        Create-PlatformConfig "cursor" ".cursorrules" "base.md"
+        Create-PlatformConfig "windsurf" ".windsurfrules" "base.md"
+        Create-PlatformConfig "kiro" ".kiro\steering\project.md" "project.md"
+        Create-PlatformConfig "copilot" ".github\copilot-instructions.md" "instructions.md"
     }
 }
 
@@ -152,22 +190,27 @@ Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Project structure:" -ForegroundColor White
 Write-Host "  $ProjectPath" -ForegroundColor Gray
-Write-Host "  ├── .shared/          (skills, agents, workflows)" -ForegroundColor Gray
-Write-Host "  ├── .agent/           (symlinks to .shared)" -ForegroundColor Gray
+Write-Host "  ├── core/              (skills, agents, workflows)" -ForegroundColor Gray
+Write-Host "  ├── .agent/            (symlinks to core)" -ForegroundColor Gray
 if ($Platform -eq "all" -or $Platform -eq "claude") {
-    Write-Host "  ├── CLAUDE.md         (Claude Code config)" -ForegroundColor Gray
+    Write-Host "  ├── CLAUDE.md          (Claude Code config)" -ForegroundColor Gray
+    Write-Host "  ├── .claude/skills/    (symlink to core/skills)" -ForegroundColor Gray
 }
 if ($Platform -eq "all" -or $Platform -eq "cursor") {
-    Write-Host "  ├── .cursorrules      (Cursor config)" -ForegroundColor Gray
+    Write-Host "  ├── .cursorrules       (Cursor config)" -ForegroundColor Gray
 }
 if ($Platform -eq "all" -or $Platform -eq "windsurf") {
-    Write-Host "  ├── .windsurfrules    (Windsurf config)" -ForegroundColor Gray
+    Write-Host "  ├── .windsurfrules     (Windsurf config)" -ForegroundColor Gray
 }
 if ($Platform -eq "all" -or $Platform -eq "kiro") {
-    Write-Host "  └── .kiro/            (Kiro config)" -ForegroundColor Gray
+    Write-Host "  ├── .kiro/             (Kiro config)" -ForegroundColor Gray
+}
+if ($Platform -eq "all" -or $Platform -eq "copilot") {
+    Write-Host "  └── .github/           (Copilot config)" -ForegroundColor Gray
 }
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "  1. cd $ProjectPath" -ForegroundColor White
-Write-Host "  2. Start development with /full-dev command" -ForegroundColor White
+Write-Host "  2. Customize platform config files as needed" -ForegroundColor White
+Write-Host "  3. Start development with your AI assistant" -ForegroundColor White
 Write-Host ""
