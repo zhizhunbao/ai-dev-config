@@ -1,6 +1,9 @@
 ---
 name: quick-dev
 description: 'Flexible development - execute tech-specs OR direct instructions with optional planning.'
+skills:
+  - dev-pdf_processing
+  - dev-pptx_to_pdf
 ---
 
 # Quick Dev Workflow
@@ -42,6 +45,11 @@ Load config from `{project-root}/_bmad/bmm/config.yaml` and resolve:
 - `quick_spec_workflow` = `{project-root}/_bmad/bmm/workflows/bmad-quick-flow/quick-spec/workflow.md`
 - `party_mode_exec` = `{project-root}/_bmad/core/workflows/party-mode/workflow.md`
 - `advanced_elicitation` = `{project-root}/_bmad/core/workflows/advanced-elicitation/workflow.xml`
+
+### Available Skills
+
+- `dev-pdf_processing` - PDF 处理：提取文本、图片、转换为 Markdown
+- `dev-pptx_to_pdf` - PPTX 转 PDF：使用 PowerPoint 或 LibreOffice 转换
 
 ---
 

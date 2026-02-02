@@ -26,14 +26,15 @@ state_file: '{project-root}/.dev-state.yaml'
 |------|------|--------|--------|
 | 1 | 需求分析 (requirements) | `docs/requirements.md` | ✓ 文件存在且非空 |
 | 2 | 产品需求文档 (prd) | `docs/prd.md` | ✓ 文件存在且非空 |
-| 3 | 系统架构 (architecture) | `docs/architecture.md` | ✓ 文件存在且非空 |
-| 4 | 任务分解 (stories) | `docs/stories.md` | ✓ 文件存在且非空 |
-| 5 | 数据库设计 (database) | `docs/database.md` + migrations | ✓ 文件存在 |
-| 6 | 后端开发 (backend) | `src/` 后端代码 | ✓ 代码检查通过 |
-| 7 | 前端开发 (frontend) | `src/` 前端代码 | ✓ 代码检查通过 |
-| 8 | 测试 (testing) | `tests/` | ✓ 测试通过 |
-| 9 | 代码审查 (review) | Review 报告 | ✓ 审查通过 |
-| 10 | 部署 (deployment) | 部署配置 | ✓ 部署成功 |
+| 3 | UX 设计 (ux_design) | `docs/ux-design.md` | ✓ 文件存在且非空 |
+| 4 | 系统架构 (architecture) | `docs/architecture.md` | ✓ 文件存在且非空 |
+| 5 | 任务分解 (stories) | `docs/stories.md` | ✓ 文件存在且非空 |
+| 6 | 数据库设计 (database) | `docs/database.md` + migrations | ✓ 文件存在 |
+| 7 | 后端开发 (backend) | `src/` 后端代码 | ✓ 代码检查通过 |
+| 8 | 前端开发 (frontend) | `src/` 前端代码 | ✓ 代码检查通过 |
+| 9 | 测试 (testing) | `tests/` | ✓ 测试通过 |
+| 10 | 代码审查 (review) | Review 报告 | ✓ 审查通过 |
+| 11 | 部署 (deployment) | 部署配置 | ✓ 部署成功 |
 
 ---
 
@@ -47,7 +48,7 @@ state_file: '{project-root}/.dev-state.yaml'
 # .dev-state.yaml 示例
 project: my-project
 started_at: 2025-01-28T10:00:00
-current_phase: 3
+current_phase: 4
 phases:
   requirements:
     status: completed
@@ -57,9 +58,13 @@ phases:
     status: completed
     completed_at: 2025-01-28T11:00:00
     output: docs/prd.md
+  ux_design:
+    status: completed
+    completed_at: 2025-01-28T11:30:00
+    output: docs/ux-design.md
   architecture:
     status: in_progress
-    started_at: 2025-01-28T11:30:00
+    started_at: 2025-01-28T12:00:00
   stories:
     status: pending
   database:
@@ -125,51 +130,78 @@ phases:
 
 ---
 
-### Phase 3: 系统架构 (architecture)
+### Phase 3: UX 设计 (ux_design)
 
-**触发条件**: `docs/architecture.md` 不存在或为空
+**触发条件**: `docs/ux-design.md` 不存在或为空
 
 **前置条件**: Phase 2 完成
 
 **执行步骤**:
-1. 加载 skill: `dev-senior_architect`
+1. 加载 skill: `dev-ux_designer`
 2. 读取 `docs/prd.md`
+3. 执行 workflow: `2-plan-workflows/create-ux-design`
+4. 创建用户画像 (Personas)
+5. 绘制用户旅程地图 (Journey Maps)
+6. 设计信息架构 (Information Architecture)
+7. 创建交互设计规范 (Interaction Patterns)
+8. 定义视觉设计系统 (Design System)
+9. 生成 `docs/ux-design.md`
+
+**完成检查**:
+- [ ] `docs/ux-design.md` 存在
+- [ ] 文件包含：用户画像、旅程地图、信息架构、交互模式、设计系统
+
+**完成后**: 更新状态，进入 Phase 4
+
+---
+
+### Phase 4: 系统架构 (architecture)
+
+**触发条件**: `docs/architecture.md` 不存在或为空
+
+**前置条件**: Phase 3 完成
+
+**执行步骤**:
+1. 加载 skill: `dev-senior_architect`
+2. 读取 `docs/prd.md` 和 `docs/ux-design.md`
 3. 执行 workflow: `3-solutioning/create-architecture`
 4. 生成 `docs/architecture.md`
 
 **完成检查**:
 - [ ] `docs/architecture.md` 存在
 - [ ] 文件包含：技术栈、系统组件、数据流、API 设计
+- [ ] 架构设计符合 UX 设计规范
 
-**完成后**: 更新状态，进入 Phase 4
+**完成后**: 更新状态，进入 Phase 5
 
 ---
 
-### Phase 4: 任务分解 (stories)
+### Phase 5: 任务分解 (stories)
 
 **触发条件**: `docs/stories.md` 不存在或为空
 
-**前置条件**: Phase 3 完成
+**前置条件**: Phase 4 完成
 
 **执行步骤**:
 1. 加载 skill: `dev-product_manager`
-2. 读取 `docs/architecture.md`
+2. 读取 `docs/architecture.md` 和 `docs/ux-design.md`
 3. 执行 workflow: `3-solutioning/create-epics-and-stories`
 4. 生成 `docs/stories.md`
 
 **完成检查**:
 - [ ] `docs/stories.md` 存在
 - [ ] 文件包含：Epic 列表、Story 列表、任务依赖关系
+- [ ] Story 覆盖 UX 设计中的所有用户旅程
 
-**完成后**: 更新状态，进入 Phase 5
+**完成后**: 更新状态，进入 Phase 6
 
 ---
 
-### Phase 5: 数据库设计 (database)
+### Phase 6: 数据库设计 (database)
 
 **触发条件**: `docs/database.md` 不存在或为空
 
-**前置条件**: Phase 4 完成
+**前置条件**: Phase 5 完成
 
 **执行步骤**:
 1. 加载 skill: `dev-senior_data_engineer`
@@ -183,15 +215,15 @@ phases:
 - [ ] 文件包含：ER 图、表结构、索引设计
 - [ ] 运行检查脚本（如有）
 
-**完成后**: 更新状态，进入 Phase 6
+**完成后**: 更新状态，进入 Phase 7
 
 ---
 
-### Phase 6: 后端开发 (backend)
+### Phase 7: 后端开发 (backend)
 
 **触发条件**: 后端代码未完成
 
-**前置条件**: Phase 5 完成
+**前置条件**: Phase 6 完成
 
 **执行步骤**:
 1. 加载 skill: `dev-senior_backend`
@@ -204,56 +236,60 @@ phases:
 - [ ] 所有后端 Story 完成
 - [ ] 检查脚本通过
 
-**完成后**: 更新状态，进入 Phase 7
-
----
-
-### Phase 7: 前端开发 (frontend)
-
-**触发条件**: 前端代码未完成
-
-**前置条件**: Phase 6 完成（或可并行）
-
-**执行步骤**:
-1. 加载 skill: `dev-senior_frontend`
-2. 读取 `docs/stories.md`，获取待开发 Story
-3. 执行 workflow: `4-implementation/dev-story`
-4. 开发组件、页面、状态管理
-5. 每完成一个模块，运行检查脚本
-
-**完成检查**:
-- [ ] 所有前端 Story 完成
-- [ ] 检查脚本通过
-
 **完成后**: 更新状态，进入 Phase 8
 
 ---
 
-### Phase 8: 测试 (testing)
+### Phase 8: 前端开发 (frontend)
 
-**触发条件**: 测试未完成
+**触发条件**: 前端代码未完成
 
-**前置条件**: Phase 6, 7 完成
+**前置条件**: Phase 7 完成（或可并行）
 
 **执行步骤**:
-1. 加载 skill: `dev-senior_qa`
-2. 读取 `docs/prd.md` 中的验收标准
-3. 执行 workflow: `testarch/automate`
-4. 编写/运行测试
+1. 加载 skill: `dev-senior_frontend` 和 `dev-ux_designer`
+2. 读取 `docs/stories.md` 和 `docs/ux-design.md`
+3. 执行 workflow: `4-implementation/dev-story`
+4. 开发组件、页面、状态管理
+5. 确保实现符合 UX 设计规范
+6. 每完成一个模块，运行检查脚本
 
 **完成检查**:
-- [ ] 测试覆盖率达标
-- [ ] 所有测试通过
+- [ ] 所有前端 Story 完成
+- [ ] 检查脚本通过
+- [ ] UI/UX 符合设计规范
 
 **完成后**: 更新状态，进入 Phase 9
 
 ---
 
-### Phase 9: 代码审查 (review)
+### Phase 9: 测试 (testing)
+
+**触发条件**: 测试未完成
+
+**前置条件**: Phase 7, 8 完成
+
+**执行步骤**:
+1. 加载 skill: `dev-senior_qa`
+2. 读取 `docs/prd.md` 中的验收标准
+3. 读取 `docs/ux-design.md` 中的可用性测试框架
+4. 执行 workflow: `testarch/automate`
+5. 编写/运行测试（包括可用性测试）
+
+**完成检查**:
+- [ ] 测试覆盖率达标
+- [ ] 所有测试通过
+- [ ] 可用性测试通过
+
+**完成后**: 更新状态，进入 Phase 10
+
+---
+
+### Phase 10: 代码审查 (review)
 
 **触发条件**: 审查未完成
 
-**前置条件**: Phase 8 完成
+**前置条件**: Phase 9 完成
 
 **执行步骤**:
 1. 加载 skill: `dev-code_reviewer`
@@ -265,15 +301,15 @@ phases:
 - [ ] 审查报告生成
 - [ ] 所有严重问题已修复
 
-**完成后**: 更新状态，进入 Phase 10
+**完成后**: 更新状态，进入 Phase 11
 
 ---
 
-### Phase 10: 部署 (deployment)
+### Phase 11: 部署 (deployment)
 
 **触发条件**: 部署未完成
 
-**前置条件**: Phase 9 完成
+**前置条件**: Phase 10 完成
 
 **执行步骤**:
 1. 加载 skill: `dev-senior_devops`

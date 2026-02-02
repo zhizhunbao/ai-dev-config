@@ -1,0 +1,40 @@
+# BMAD Method Configuration
+# 配置工作流输出目录和项目设置
+
+# === User Settings ===
+user_name: "Developer"
+communication_language: "zh-CN" # Options: en, zh-CN, ko
+document_output_language: "zh-CN" # Language for generated docs
+user_skill_level: "senior" # Options: junior, mid, senior, expert
+
+# === Project Settings ===
+project_name: "Gangwon Business Portal"
+project_type: "web" # From documentation-requirements.csv
+field_type: "brownfield" # greenfield or brownfield
+
+# === Output Directories ===
+# All paths relative to project root
+output_folder: "./docs"
+planning_artifacts: "./docs/planning"
+implementation_artifacts: "./docs/implementation"
+project_knowledge: "./docs/project-knowledge"
+
+# === Input Discovery ===
+# Patterns for finding existing project documents
+input_discovery:
+  prd_patterns:
+    - "./docs/planning/*prd*.md"
+    - "./docs/planning/master_prd.md"
+  architecture_patterns:
+    - "./docs/planning/*architecture*.md"
+    - "./docs/planning/system-architecture.md"
+  ux_design_patterns:
+    - "./docs/planning/*ux*.md"
+    - "./docs/planning/*design*.md"
+  epics_patterns:
+    - "./docs/implementation/*epic*.md"
+
+# === Workflow Settings ===
+default_scan_level: "moderate" # quick, moderate, exhaustive
+enable_adversarial_review: true
+auto_save_state: true

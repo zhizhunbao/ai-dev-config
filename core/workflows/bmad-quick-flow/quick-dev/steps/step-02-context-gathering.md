@@ -5,6 +5,9 @@ description: 'Quick context gathering for direct mode - identify files, patterns
 workflow_path: '{project-root}/_bmad/bmm/workflows/bmad-quick-flow/quick-dev'
 thisStepFile: './step-02-context-gathering.md'
 nextStepFile: './step-03-execute.md'
+skills:
+  - dev-pdf_processing
+  - dev-pptx_to_pdf
 ---
 
 # Step 2: Context Gathering (Direct Mode)
@@ -25,6 +28,42 @@ From step-01:
 
 ---
 
+## AVAILABLE SKILLS
+
+### PDF Processing (`dev-pdf_processing`)
+
+**When to use:**
+- User provides PDF requirements document
+- Need to extract text and images from PDF
+- Convert PDF to markdown for documentation
+
+**Scripts available:**
+- `pdf_to_image_md.py` - Convert PDF to markdown with page images
+- `pdf_to_md_hybrid.py` - Hybrid text + OCR extraction
+- `pdf_converter.py` - Basic PDF to markdown conversion
+
+**Example usage:**
+```bash
+uv run python .github/ai-dev-config/core/skills/dev-pdf_processing/scripts/pdf_to_image_md.py <pdf_file> -o output.md
+```
+
+### PPTX to PDF (`dev-pptx_to_pdf`)
+
+**When to use:**
+- User provides PPTX requirements document
+- Need to convert PPTX to PDF for easier processing
+
+**Scripts available:**
+- `convert_single.py` - Convert single PPTX file
+- `batch_convert.py` - Batch convert multiple files
+
+**Example usage:**
+```bash
+uv run python .github/ai-dev-config/core/skills/dev-pptx_to_pdf/scripts/convert_single.py <input.pptx> --method windows
+```
+
+---
+
 ## EXECUTION SEQUENCE
 
 ### 1. Identify Files to Modify
@@ -34,6 +73,7 @@ Based on user's direct instructions:
 - Search for relevant files using glob/grep
 - Identify the specific files that need changes
 - Note file locations and purposes
+- **If user provides PDF/PPTX:** Use appropriate skill to extract requirements
 
 ### 2. Find Relevant Patterns
 
@@ -111,6 +151,7 @@ Ready to execute? (y/n/adjust)
 - Dependencies noted
 - Mental plan created with tasks and AC
 - User confirmed readiness to proceed
+- Skills used appropriately when PDF/PPTX provided
 
 ## FAILURE MODES
 
@@ -118,3 +159,4 @@ Ready to execute? (y/n/adjust)
 - Proceeding without identifying files to modify
 - Not presenting plan for user confirmation
 - Missing obvious patterns in existing code
+- Not using skills when PDF/PPTX requirements provided

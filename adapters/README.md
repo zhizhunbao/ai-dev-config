@@ -11,7 +11,7 @@
 | Cursor          | `cursor/`      | `.cursorrules`                    | ✅ 完整   |
 | Windsurf        | `windsurf/`    | `.windsurfrules`                  | ✅ 完整   |
 | Kiro            | `kiro/`        | `.kiro/steering/`                 | ✅ 完整   |
-| OpenAI Codex    | `codex/`       | `AGENTS.md`                       | 🚧 计划中 |
+| OpenAI Codex    | `codex/`       | `AGENTS.md`                       | ✅ 完整   |
 | Antigravity     | `antigravity/` | `.agent/`                         | ✅ 完整   |
 | VS Code Copilot | `copilot/`     | `.github/copilot-instructions.md` | ✅ 完整   |
 
